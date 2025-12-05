@@ -1,51 +1,109 @@
-from turtledemo.paint import switchupdown
-
-
+# функция 1 уровня
 def lvl_1():
-    print("\n\nУровень 1!")
-    inp = input("Введите строку для работы: ")
-    print(inp, "+", "upper() ->", inp.upper())
-    print(inp, "+", "lower() ->", inp.lower())
-    print(inp, "+", "capitalize ->", inp.capitalize())
-
+    # 1 уровень
+    print("\n")
+    print("\n")
+    print("Уровень 1!")
+    a = input("Введите строку для работы: ") # ввод строки
+    # делаем upper
+    b = a.upper()
+    print(a, "+", "upper() ->", b)
+    # делаем lower
+    c = a.lower()
+    print(a, "+", "lower() ->", c)
+    # делаем capitalize
+    d = a.capitalize()
+    print(a, "+", "capitalize ->", d)
+    
 def lvl_2():
-    print("\n\nУровень 2!")
-    inp = input("Введите строку со словом 'круто': ")
-    print(inp, "+ find('круто') ->", inp.lower().find("круто"))
-    print(inp, "+ replace('круто', 'ужас') ->", inp.replace("круто", "ужас"))
-    print(inp, f"+ count('о') ->", inp.lower().count("о"))
+    # второй уровень
+    print("\n")
+    print("\n")
+    print("Уровень 2!")
+    stroka = input("Введите строку со словом 'круто': ")
+    # ищем круто
+    n1 = stroka.lower() # сначала в нижний регистр
+    n2 = n1.find("круто") # потом ищем
+    print(stroka, "+ find('круто') ->", n2)
+    # заменяем
+    z = stroka.replace("круто", "ужас")
+    print(stroka, "+ replace('круто', 'ужас') ->", z)
+    # считаем о
+    o1 = stroka.lower()
+    o2 = o1.count("о")
+    print(stroka, f"+ count('о') ->", o2)
 
 def lvl_3():
-    print("\n\nУровень 3")
-    inp = input("Введите строку с символами ',': ")
-    print(f"'{inp}' + split(',') ->", inp.split(','))
-    print(f"'{inp}' + join(';') ->", ";".join(inp.split(',')))
+    # уровень 3
+    print("\n")
+    print("\n")
+    print("Уровень 3")
+    s = input("Введите строку с символами ',': ")
+    # split
+    sp = s.split(',') # разделяем
+    print(f"'{s}' + split(',') ->", sp)
+    # join
+    j = ";".join(sp) # соединяем
+    print(f"'{s}' + join(';') ->", j)
 
 def lvl_4():
-    print("\n\nУровень 4")
-    inp1 = input("Введите число: ")
-    inp2 = input("Введите строку: ")
-    inp3 = input("Введите строку с пробелами: ")
-
-    print(f"'{inp1}' + isdigit() ->", inp1.isdigit())
-    print(f"'{inp2}' + isalpha() ->", inp2.isalpha())
-    print(f"'{inp3}' + strip() -> '{inp3.strip()}'")
+    # четвертый уровень
+    print("\n")
+    print("\n")
+    print("Уровень 4")
+    # три переменные
+    chislo = input("Введите число: ")
+    slovo = input("Введите строку: ")
+    s_probelami = input("Введите строку с пробелами: ")
+    
+    # проверка isdigit
+    dig = chislo.isdigit()
+    print(f"'{chislo}' + isdigit() ->", dig)
+    
+    # проверка isalpha
+    alph = slovo.isalpha()
+    print(f"'{slovo}' + isalpha() ->", alph)
+    
+    # strip
+    strip_result = s_probelami.strip()
+    print(f"'{s_probelami}' + strip() -> '{strip_result}'")
 
 def lvl_5():
-    inp = input("Введите 'грязную' строку для нормализации: ")
-    print(f"'{inp}' ->", " ".join(inp.strip().lower().split(";")).capitalize())
+    # пятый уровень
+    dirty = input("Введите 'грязную' строку для нормализации: ")
+    # много операций
+    step1 = dirty.strip() # убираем пробелы
+    step2 = step1.lower() # в нижний регистр
+    step3 = step2.split(";") # разделяем
+    step4 = " ".join(step3) # соединяем
+    step5 = step4.capitalize() # заглавная буква
+    print(f"'{dirty}' ->", step5)
 
-selectedLevel = -1
+# главная часть программы
+selectedLevel = -1 # начинаем с -1
+
+# цикл while
 while selectedLevel != 0:
-    selectedLevel = int(input("\nВведите уровень игры от 1 до 5. 0 - для выхода: "))
-    match selectedLevel:
-        case 1:
-            lvl_1()
-        case 2:
-            lvl_2()
-        case 3:
-            lvl_3()
-        case 4:
-            lvl_4()
-        case 5:
-            lvl_5()
+    # спрашиваем уровень
+    try:
+        selectedLevel = int(input("\nВведите уровень игры от 1 до 5. 0 - для выхода: "))
+    except:
+        print("Ошибка! Введите число!")
+        continue
+    
+    # проверяем через if-elif
+    if selectedLevel == 1:
+        lvl_1()
+    elif selectedLevel == 2:
+        lvl_2()
+    elif selectedLevel == 3:
+        lvl_3()
+    elif selectedLevel == 4:
+        lvl_4()
+    elif selectedLevel == 5:
+        lvl_5()
+    elif selectedLevel == 0:
+        print("Выход из программы...")
+        break
+    else:
+        print("Неправильный уровень! Введите от 1 до 5 или 0 для выхода")
