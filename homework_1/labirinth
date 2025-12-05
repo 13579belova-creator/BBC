@@ -1,261 +1,432 @@
+# импортируем рандом для случайных чисел
 import random
 
+# класс для игрока
 class Player:
+    # конструктор класса
     def __init__(self):
-        self.hp = 100  # Здоровье игрока
-        self.mana = 50  # Мана для использования навыков
-        self.attack = 15  # Сила атаки
-        self.defense = 5  # Защита
+        self.hp = 100  # здоровье
+        self.mana = 50  # мана
+        self.attack = 15  # атака
+        self.defense = 5  # защита
 
-def player_skills(mana: int, attack: int):
-    damage = 0
-    print("Доступные навыки:\n1) Базовая атака (Расход маны: 0, Урон: 100% от атаки)\n2) Сильная атака (Расход маны: 10, Урон: 150% от атаки)\n3) Особая атака (Расход маны: 20, Урон: 200% от атаки)")
+# функция для выбора скиллов игрока
+def player_skills(mana, attack):
+    damage = 0  # урон сначала 0
+    # показываем навыки
+    print("Доступные навыки:")
+    print("1) Базовая атака (Расход маны: 0, Урон: 100% от атаки)")
+    print("2) Сильная атака (Расход маны: 10, Урон: 150% от атаки)")
+    print("3) Особая атака (Расход маны: 20, Урон: 200% от атаки)")
     print("Выберите навык для использования:")
-
-    while damage == 0:
+    
+    # цикл пока не выберет правильный скилл
+    while True:
         try:
-            ch = int(input())
+            ch = int(input())  # вводим число
+            
             if ch == 1:
-                damage = attack  # Базовая атака без затрат маны
+                # базовая атака
+                damage = attack
+                break  # выходим из цикла
             elif ch == 2:
+                # проверяем ману
                 if mana >= 10:
-                    damage = int(attack * 1.5)  # Урон увеличен на 50%
-                    mana -= 10  # Тратится мана
+                    damage = int(attack * 1.5)  # умножаем на 1.5
+                    mana = mana - 10  # отнимаем ману
+                    break
                 else:
-                    print("Недостаточно маны для этого навыка. Выберите другой:")
+                    print("Недостаточно маны! Выберите другой навык:")
             elif ch == 3:
                 if mana >= 20:
-                    damage = int(attack * 2.0)  # Урон увеличен в 2 раза
-                    mana -= 20  # Тратится мана
+                    damage = int(attack * 2.0)  # умножаем на 2
+                    mana = mana - 20
+                    break
                 else:
-                    print("Недостаточно маны для этого навыка. Выберите другой:")
+                    print("Недостаточно маны! Выберите другой навык:")
             else:
-                print("Неверный выбор. Пожалуйста, выберите 1, 2 или 3:")
-        except ValueError:
-            print("Пожалуйста, введите число:")
+                # если выбрал не 1,2,3
+                print("Неправильный выбор! Введите 1, 2 или 3:")
+        except:
+            # если ввел не число
+            print("Ошибка! Нужно ввести число!")
 
+    # возвращаем ману и урон
     return [mana, damage]
 
+# класс для монстра
 class Monster:
     def __init__(self):
-        self.hp = 60  # Здоровье монстра
-        self.attack = 12  # Атака монстра
-        self.defense = 3  # Защита монстра
+        self.hp = 60
+        self.attack = 12
+        self.defense = 3
 
-def fight_monster(player_hp: int, player_mana: int, player_attack: int, backpack: list):
-    monster = Monster()
+# функция для боя с монстром
+def fight_monster(player_hp, player_mana, player_attack, backpack):
+    # создаем монстра
+    m = Monster()
+    
     print("Вы встретили Монстра!")
-    print(f'Здоровье врага: {monster.hp}')
-    print(f'Атака врага: {monster.attack}')
-    print(f'Защита врага: {monster.defense}')
-
-    # Проверка на наличие яда в инвентаре
-    if 'Poison' in backpack:
-        print('Хотите использовать яд перед боем? (Y/N)')
-        ans = str(input()).upper()
-        if ans == 'Y':
+    print("Здоровье врага:", m.hp)
+    print("Атака врага:", m.attack)
+    print("Защита врага:", m.defense)
+    
+    # проверяем есть ли яд в рюкзаке
+    have_poison = False
+    for item in backpack:
+        if item == 'Poison':
+            have_poison = True
+    
+    if have_poison:
+        print("У вас есть яд! Использовать его? (Y/N)")
+        choice = input().upper()  # делаем большую букву
+        if choice == 'Y':
+            # удаляем яд из рюкзака
             backpack.remove('Poison')
-            monster.hp -= 20  # Яд наносит урон монстру
-            print("Вы использовали яд! Монстр потерял 20 HP.")
-
-    # Цикл боя
-    while monster.hp > 0 and player_hp > 0:
-        print(f'\nЗдоровье врага: {monster.hp}')
-        print(f'Ваше здоровье: {player_hp}')
-        print(f'Ваша мана: {player_mana}')
-
-        # Ход игрока
-        fight_res = player_skills(player_mana, player_attack)
-        player_mana = fight_res[0]
-        damage = max(0, fight_res[1] - monster.defense)  # Учитываем защиту монстра
-        monster.hp -= damage
-        print(f"Вы нанесли {damage} урона монстру!")
-
-        # Проверка на победу
-        if monster.hp <= 0:
+            # наносим урон монстру
+            m.hp = m.hp - 20
+            print("Монстр отравлен! -20 HP")
+    
+    # цикл боя
+    while m.hp > 0 and player_hp > 0:
+        print("\n--- Ход игрока ---")
+        print("Здоровье монстра:", m.hp)
+        print("Ваше здоровье:", player_hp)
+        print("Ваша мана:", player_mana)
+        
+        # ход игрока
+        res = player_skills(player_mana, player_attack)
+        player_mana = res[0]
+        dmg = res[1]
+        
+        # учитываем защиту монстра
+        real_damage = dmg - m.defense
+        if real_damage < 0:
+            real_damage = 0
+        
+        m.hp = m.hp - real_damage
+        print(f"Вы нанесли {real_damage} урона!")
+        
+        # проверяем убит ли монстр
+        if m.hp <= 0:
+            print("Монстр побежден!")
             break
+        
+        print("\n--- Ход монстра ---")
+        # монстр атакует
+        monster_dmg = m.attack - 2  # у игрока есть защита
+        if monster_dmg < 0:
+            monster_dmg = 0
+        
+        player_hp = player_hp - monster_dmg
+        print(f"Монстр атакует! Вы получаете {monster_dmg} урона")
+    
+    # восстанавливаем немного маны после боя
+    player_mana = player_mana + 5
+    if player_mana > 50:
+        player_mana = 50
+    
+    return [m.hp, player_hp, player_mana, backpack]
 
-        # Ход монстра
-        monster_damage = max(0, monster.attack - 2)  # Игрок имеет базовую защиту
-        player_hp -= monster_damage
-        print(f"Монстр атакует! Вы получаете {monster_damage} урона.")
-
-    # Восстановление маны после боя
-    player_mana = min(50, player_mana + 5)
-
-    return [monster.hp, player_hp, player_mana, backpack]
-
-def chest_loot(backpack: list):
-    items = ['Healing potion', 'Power Up', 'Poison']
-    item = random.choice(items)  # Случайный предмет из сундука
-    backpack.append(item)
-    print(f'Вы нашли {item}!')
-
-    # Описание предметов
-    if item == 'Healing potion':
-        print('Зелье лечения: Восстанавливает 20 HP при использовании.')
-    elif item == 'Power Up':
-        print('Усиление: Постоянно увеличивает ваши характеристики.')
-    elif item == 'Poison':
-        print("Яд: Наносит 20 урона врагу в начале боя.")
-
+# функция для открытия сундука
+def chest_loot(backpack):
+    # список возможных предметов
+    items_list = ['Healing potion', 'Power Up', 'Poison']
+    
+    # выбираем случайный предмет
+    random_item = random.choice(items_list)
+    
+    # добавляем в рюкзак
+    backpack.append(random_item)
+    
+    print(f"Вы нашли: {random_item}!")
+    
+    # описание предмета
+    if random_item == 'Healing potion':
+        print("Восстанавливает 20 HP при использовании")
+    elif random_item == 'Power Up':
+        print("Увеличивает ваши характеристики")
+    elif random_item == 'Poison':
+        print("Наносит 20 урона врагу в начале боя")
+    
     return backpack
 
-def use_healing_potion(hp: int, backpack: list):
-    if 'Healing potion' in backpack:
+# функция для использования зелья лечения
+def use_healing_potion(hp, backpack):
+    # проверяем есть ли зелье
+    have_potion = False
+    for item in backpack:
+        if item == 'Healing potion':
+            have_potion = True
+    
+    if have_potion:
+        # удаляем зелье
         backpack.remove('Healing potion')
-        hp = min(100, hp + 20)  # Лечение, но не больше максимума
-        print('Ваше здоровье восстановлено на 20!')
+        # лечимся
+        hp = hp + 20
+        if hp > 100:
+            hp = 100
+        print("Использовано зелье лечения! +20 HP")
     else:
-        print("У вас нет зелий лечения.")
+        print("У вас нет зелий лечения!")
+    
     return [hp, backpack]
 
-def use_power_up(player: Player, backpack: list):
-    if 'Power Up' in backpack:
+# функция для использования усиления
+def use_power_up(player, backpack):
+    # проверяем есть ли усиление
+    have_power = False
+    for item in backpack:
+        if item == 'Power Up':
+            have_power = True
+    
+    if have_power:
+        # удаляем предмет
         backpack.remove('Power Up')
-        # Увеличение всех характеристик
-        player.hp += 10
-        player.attack += 5
-        player.defense += 2
-        print('Ваши характеристики увеличены!')
+        # улучшаем характеристики
+        player.hp = player.hp + 10
+        player.attack = player.attack + 5
+        player.defense = player.defense + 2
+        print("Характеристики улучшены!")
+        print(f"HP: +10, Атака: +5, Защита: +2")
     else:
-        print("У вас нет усилений.")
+        print("У вас нет усиления!")
+    
     return backpack
 
-def show_backpack(backpack: list):
-    if not backpack:
-        print("Ваш рюкзак пуст.")
+# функция для показа рюкзака
+def show_backpack(backpack):
+    if len(backpack) == 0:
+        print("Рюкзак пуст!")
     else:
-        print("В вашем рюкзаке:")
-        for item in set(backpack):
-            print(f"- {item}: {backpack.count(item)}")  # Показываем количество каждого предмета
+        print("Содержимое рюкзака:")
+        # считаем предметы
+        items_count = {}
+        for item in backpack:
+            if item in items_count:
+                items_count[item] = items_count[item] + 1
+            else:
+                items_count[item] = 1
+        
+        # выводим
+        for item, count in items_count.items():
+            print(f"{item}: {count} шт.")
 
-def show_stats(player: Player):
-    print(f"HP: {player.hp}/100")
+# функция для показа характеристик
+def show_stats(player):
+    print("=== ХАРАКТЕРИСТИКИ ИГРОКА ===")
+    print(f"Здоровье (HP): {player.hp}/100")
     print(f"Мана: {player.mana}/50")
     print(f"Атака: {player.attack}")
     print(f"Защита: {player.defense}")
+    print("=============================")
 
-# Основная игра
+# основная функция игры
 def main():
-    print("Добро пожаловать в Подземелье!")
-    print("Пройдите через подземелье, найдите портал и сбегите!")
-
-    # Создание игрока
-    player = Player()
-
-    # Создание подземелья
-    print('Какой размер лабиринта вы хотите? (Введите n m):')
+    print("=== ДОБРО ПОЖАЛОВАТЬ В ПОДЗЕМЕЛЬЕ ===")
+    print("Цель: найти портал и сбежать!")
+    print("=====================================")
+    
+    # создаем игрока
+    p = Player()
+    
+    # создаем лабиринт
+    print("Введите размер подземелья (например: 5 5):")
     try:
-        n, m = map(int, input().split())
+        size_input = input()
+        parts = size_input.split()
+        n = int(parts[0])  # ширина
+        m = int(parts[1])  # высота
     except:
-        n, m = 5, 5  # Размер по умолчанию
-
-    # Типы комнат: E-Пустая, C-Сундук, M-Монстр
-    rooms = ['E', 'C', 'M']
-    labyrinth = [[random.choice(rooms) for _ in range(n)] for _ in range(m)]
-    labyrinth[m-1][n-1] = 'P'  # Портал в конце
-    labyrinth[0][0] = 'E'  # Стартовая позиция
-
-    # Отображение карты
-    lab_interface = [['*' for _ in range(n)] for _ in range(m)]
-    lab_interface[0][0] = 'X'  # Позиция игрока
-
-    x, y = 0, 0  # Координаты игрока
-    backpack = []  # Инвентарь
-    has_key = False  # Найден ли ключ
-
-    print("\nУправление:")
-    print("w - вверх, s - вниз, a - влево, d - вправо")
-    print("stats - показать характеристики, backpack - показать инвентарь")
-    print("heal - использовать зелье лечения, powerup - использовать усиление")
-
-    # Главный игровой цикл
-    while player.hp > 0:
-        # Отображение карты
-        print("\nТекущее подземелье:")
-        for row in lab_interface:
+        print("Ошибка! Будут использованы размеры по умолчанию 5x5")
+        n = 5
+        m = 5
+    
+    # типы комнат
+    # E - пустая, C - сундук, M - монстр
+    room_types = ['E', 'C', 'M']
+    
+    # создаем лабиринт
+    lab = []
+    for i in range(m):  # строки
+        row = []
+        for j in range(n):  # столбцы
+            # случайная комната
+            room = random.choice(room_types)
+            row.append(room)
+        lab.append(row)
+    
+    # помещаем портал в конец
+    lab[m-1][n-1] = 'P'
+    # стартовая позиция
+    lab[0][0] = 'E'
+    
+    # карта для отображения
+    display_map = []
+    for i in range(m):
+        row = []
+        for j in range(n):
+            row.append('*')  # неисследовано
+        display_map.append(row)
+    
+    # позиция игрока
+    display_map[0][0] = 'X'
+    
+    # координаты игрока
+    x = 0
+    y = 0
+    
+    # рюкзак
+    backpack = []
+    
+    # есть ли ключ
+    has_key = False
+    
+    print("\n=== УПРАВЛЕНИЕ ===")
+    print("w - вверх")
+    print("s - вниз")
+    print("a - влево")
+    print("d - вправо")
+    print("stats - показать характеристики")
+    print("backpack - показать рюкзак")
+    print("heal - использовать зелье лечения")
+    print("powerup - использовать усиление")
+    print("==================")
+    
+    # главный игровой цикл
+    game_over = False
+    while not game_over and p.hp > 0:
+        # показываем карту
+        print("\n--- КАРТА ---")
+        for row in display_map:
             print(' '.join(row))
-        print("X - ваша позиция, * - неисследованные комнаты")
-
-        print('\nВведите команду:')
-        command = input().lower()
-
-        moved = False
-        old_x, old_y = x, y  # Старые координаты для обновления карты
-
-        # Обработка движения
-        if command == 'w' and y > 0:
-            y -= 1  # Движение вверх
-            moved = True
-        elif command == 's' and y < m-1:
-            y += 1  # Движение вниз
-            moved = True
-        elif command == 'a' and x > 0:
-            x -= 1  # Движение влево
-            moved = True
-        elif command == 'd' and x < n-1:
-            x += 1  # Движение вправо
-            moved = True
-
-        # Если игрок переместился
-        if moved:
-            lab_interface[old_y][old_x] = 'E'  # Помечаем старую позицию как исследованную
-            lab_interface[y][x] = 'X'  # Помечаем новую позицию
-
-            room_type = labyrinth[y][x]
-            print(f"\nВы входите в новую комнату...")
-
-            if room_type == 'E':
-                print("Эта комната пуста.")
-                player.mana = min(50, player.mana + 5)  # Восстановление маны
-
-            elif room_type == 'C':
-                print("Вы нашли сундук!")
-                backpack = chest_loot(backpack)
-                player.mana = min(50, player.mana + 5)
-
-            elif room_type == 'M':
-                result = fight_monster(player.hp, player.mana, player.attack, backpack)
-                if result[1] <= 0:
-                    print("Вы побеждены! Игра окончена.")
-                    break
-                player.hp = result[1]
-                player.mana = result[2]
-                backpack = result[3]
-                if player.hp > 0:
-                    print("Вы победили монстра!")
-                    # Шанс найти ключ после победы над монстром
-                    if not has_key and random.random() < 0.3:
-                        has_key = True
-                        print("Вы нашли ключ! Теперь вы можете использовать портал.")
-
-            elif room_type == 'P':
-                if has_key:
-                    print("Поздравляем! Вы нашли портал и сбежали из подземелья!")
-                    break
-                else:
-                    print("Вы нашли портал, но вам нужен ключ чтобы активировать его!")
-                    player.mana = min(50, player.mana + 5)
-
-        # Обработка других команд
-        elif command == 'stats':
-            show_stats(player)
-        elif command == 'backpack':
+        print("X - вы, * - неисследовано")
+        print("---------------")
+        
+        # ввод команды
+        print("\nВведите команду:")
+        cmd = input().lower()
+        
+        # обработка команд
+        if cmd == 'w':
+            # движение вверх
+            if y > 0:
+                display_map[y][x] = 'V'  # посещенная комната
+                y = y - 1
+                display_map[y][x] = 'X'
+                print("Вы двинулись наверх")
+            else:
+                print("Нельзя идти наверх!")
+                continue
+        elif cmd == 's':
+            if y < m-1:
+                display_map[y][x] = 'V'
+                y = y + 1
+                display_map[y][x] = 'X'
+                print("Вы двинулись вниз")
+            else:
+                print("Нельзя идти вниз!")
+                continue
+        elif cmd == 'a':
+            if x > 0:
+                display_map[y][x] = 'V'
+                x = x - 1
+                display_map[y][x] = 'X'
+                print("Вы двинулись влево")
+            else:
+                print("Нельзя идти влево!")
+                continue
+        elif cmd == 'd':
+            if x < n-1:
+                display_map[y][x] = 'V'
+                x = x + 1
+                display_map[y][x] = 'X'
+                print("Вы двинулись вправо")
+            else:
+                print("Нельзя идти вправо!")
+                continue
+        elif cmd == 'stats':
+            show_stats(p)
+            continue
+        elif cmd == 'backpack':
             show_backpack(backpack)
-        elif command == 'heal':
-            result = use_healing_potion(player.hp, backpack)
-            player.hp = result[0]
-            backpack = result[1]
-        elif command == 'powerup':
-            backpack = use_power_up(player, backpack)
+            continue
+        elif cmd == 'heal':
+            res = use_healing_potion(p.hp, backpack)
+            p.hp = res[0]
+            backpack = res[1]
+            continue
+        elif cmd == 'powerup':
+            backpack = use_power_up(p, backpack)
+            continue
+        else:
+            print("Неизвестная команда!")
+            continue
+        
+        # проверка что в комнате
+        room = lab[y][x]
+        
+        if room == 'E':
+            print("Комната пуста")
+            # восстанавливаем ману
+            p.mana = p.mana + 5
+            if p.mana > 50:
+                p.mana = 50
+            print("Мана восстановлена на 5")
+        
+        elif room == 'C':
+            print("Вы нашли сундук!")
+            backpack = chest_loot(backpack)
+            p.mana = p.mana + 5
+            if p.mana > 50:
+                p.mana = 50
+        
+        elif room == 'M':
+            print("В комнате монстр!")
+            res = fight_monster(p.hp, p.mana, p.attack, backpack)
+            
+            # обновляем здоровье и ману
+            p.hp = res[1]
+            p.mana = res[2]
+            backpack = res[3]
+            
+            if p.hp <= 0:
+                print("Вы погибли!")
+                game_over = True
+                break
+            
+            # шанс найти ключ
+            if not has_key:
+                chance = random.randint(1, 10)  # от 1 до 10
+                if chance <= 3:  # 30% шанс
+                    has_key = True
+                    print("Вы нашли ключ от портала!")
+        
+        elif room == 'P':
+            print("Вы нашли портал!")
+            if has_key:
+                print("У вас есть ключ! Вы сбежали из подземелья!")
+                game_over = True
+                break
+            else:
+                print("У вас нет ключа! Найдите ключ чтобы использовать портал")
+                p.mana = p.mana + 5
+                if p.mana > 50:
+                    p.mana = 50
+        
+        # проверка здоровья
+        if p.hp <= 0:
+            print("Игра окончена! Вы погибли!")
+            game_over = True
+    
+    # конец игры
+    print("\n=== ИГРА ОКОНЧЕНА ===")
+    if p.hp > 0:
+        print("ПОБЕДА! Вы сбежали из подземелья!")
+    else:
+        print("ПОРАЖЕНИЕ! Попробуйте еще раз!")
+    print("======================")
 
-        # Проверка на смерть игрока
-        if player.hp <= 0:
-            print("Вы погибли! Игра окончена.")
-            break
-
-    print("Спасибо за игру!")
-
+# запуск игры
 if __name__ == "__main__":
     main()
